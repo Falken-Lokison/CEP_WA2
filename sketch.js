@@ -5,13 +5,13 @@ let showOverlay = true;
 let chaoticMode = false;
 let polarity = 1;
 let seed = 12345;
+let canvas;
 
 function setup() {
-  createCanvas(800, 600);
   canvas = createCanvas(800, 600);
-  canvas.parent(document.body); // optional, attach to body
-  canvas.elt.setAttribute("tabindex", "0"); // 🔑 allow it to receive key events
-  canvas.elt.focus(); // 🎯 set focus on load
+  canvas.elt.setAttribute("tabindex", "0");
+  canvas.elt.focus();
+  window.addEventListener("keydown", handleKeyPress);
 
   randomSeed(seed);
   noiseSeed(seed);
@@ -21,7 +21,6 @@ function setup() {
   }
 
   attractors.push(new Attractor(width/2, height/2, 500));
-
   windTunnel = new WindTunnel(200, 150, 400, 300);
 }
 
@@ -57,15 +56,16 @@ function mousePressed() {
   fireflies.push(new Firefly(mouseX, mouseY));
 }
 
-function keyPressed() {
-  if (key === 'O') showOverlay = !showOverlay;
-  if (key === 'M') chaoticMode = !chaoticMode;
-  if (key === 'P') polarity *= -1;
-  if (key === 'R') {
+function handleKeyPress(e) {
+  let k = e.key.toUpperCase();
+  if (k === 'O') showOverlay = !showOverlay;
+  if (k === 'M') chaoticMode = !chaoticMode;
+  if (k === 'P') polarity *= -1;
+  if (k === 'R') {
     seed = 12345;
     resetSketch();
   }
-  if (key === 'N') {
+  if (k === 'N') {
     seed = floor(random(99999));
     resetSketch();
   }
@@ -88,4 +88,5 @@ function drawOverlay() {
   text(`Fireflies: ${fireflies.length}`, 10, 20);
   text(`Mode: ${chaoticMode ? "Chaotic" : "Calm"}`, 10, 40);
   text(`Polarity: ${polarity === 1 ? "Attract" : "Repel"}`, 10, 60);
+  text(`Press O/M/P/R/N to test keys`, 10, 80);
 }
