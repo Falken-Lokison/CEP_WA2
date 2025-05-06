@@ -8,9 +8,14 @@ let seed = 12345;
 
 function setup() {
   createCanvas(800, 600);
+  canvas = createCanvas(800, 600);
+  canvas.parent(document.body); // optional, attach to body
+  canvas.elt.setAttribute("tabindex", "0"); // 🔑 allow it to receive key events
+  canvas.elt.focus(); // 🎯 set focus on load
+
   randomSeed(seed);
   noiseSeed(seed);
-  
+
   for (let i = 0; i < 8; i++) {
     fireflies.push(new Firefly(random(width), random(height)));
   }
