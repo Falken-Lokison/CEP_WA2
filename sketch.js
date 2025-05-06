@@ -20,7 +20,15 @@ function setup() {
     fireflies.push(new Firefly(random(width), random(height)));
   }
 
-  attractors.push(new Attractor(width/2, height/2, 500));
+  let strength = 100;
+
+
+  attractors.push(new Attractor(0, 0, strength));
+  attractors.push(new Attractor(width, 0, strength));
+  attractors.push(new Attractor(0, height, strength));
+  attractors.push(new Attractor(width, height, strength));
+  attractors.push(new Attractor(width / 2, height / 2, strength));
+
   windTunnel = new WindTunnel(200, 150, 400, 300);
 }
 
