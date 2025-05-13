@@ -35,7 +35,7 @@ for (let y = 0; y <= height; y += spacing) {
 
 attractors.push(new Attractor(width / 2, height / 2, edgeStrength));
 
-  //windTunnel = new WindTunnel(200, 150, 400, 300);
+  windTunnel = new WindTunnel(200, 150, 400, 300);
 }
 
 function draw() {
