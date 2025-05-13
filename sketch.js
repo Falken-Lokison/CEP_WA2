@@ -6,6 +6,9 @@ let chaoticMode = false;
 let polarity = 1;
 let seed = 12345;
 let canvas;
+let spawnInterval;
+let windOn = true;
+let toggleButton;
 
 function setup() {
   canvas = createCanvas(800, 600);
@@ -20,22 +23,31 @@ function setup() {
     fireflies.push(new Firefly(random(width), random(height)));
   }
 
-let edgeStrength = 100;
-let spacing = 50;
+  let edgeStrength = 100;
+  let spacing = 50;
 
-for (let x = 0; x <= width; x += spacing) {
-  attractors.push(new Attractor(x, 0, edgeStrength));
-  attractors.push(new Attractor(x, height, edgeStrength));
-}
+  for (let x = 0; x <= width; x += spacing) {
+    attractors.push(new Attractor(x, 0, edgeStrength));
+    attractors.push(new Attractor(x, height, edgeStrength));
+  }
 
-for (let y = 0; y <= height; y += spacing) {
-  attractors.push(new Attractor(0, y, edgeStrength)); 
-  attractors.push(new Attractor(width, y, edgeStrength));
-}
+  for (let y = 0; y <= height; y += spacing) {
+    attractors.push(new Attractor(0, y, edgeStrength)); 
+    attractors.push(new Attractor(width, y, edgeStrength));
+  }
 
-attractors.push(new Attractor(width / 2, height / 2, edgeStrength));
+  attractors.push(new Attractor(width / 2, height / 2, edgeStrength));
 
+  // Wind tunnel setup
   windTunnel = new WindTunnel(200, 150, 400, 300);
+
+  // Create toggle button for wind
+  toggleButton = createButton("Toggle Wind: On");
+  toggleButton.position(10, height + 10);
+  toggleButton.mousePressed(toggleWind);
+
+  // Auto-spawn fireflies from cursor every 0.5 seconds
+  spawnInterval = setInterval(spawnFromCursor, 200);
 }
 
 function draw() {
@@ -45,13 +57,18 @@ function draw() {
     attractor.display();
   }
 
+  // Display the wind tunnel if wind is on
+  if (windOn) {
+    windTunnel.display();
+  }
+
   for (let f of fireflies) {
     for (let a of attractors) {
       let force = a.attract(f);
       f.applyForce(force);
     }
 
-    if (windTunnel.contains(f)) {
+    if (windOn && windTunnel.contains(f)) {
       windTunnel.applyEffect(f);
     }
 
@@ -64,6 +81,19 @@ function draw() {
   if (showOverlay) {
     drawOverlay();
   }
+}
+
+// Auto-spawn fireflies from cursor position every 0.5 seconds
+function spawnFromCursor() {
+  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+    fireflies.push(new Firefly(mouseX, mouseY));
+  }
+}
+
+// Toggle the wind effect
+function toggleWind() {
+  windOn = !windOn;
+  toggleButton.html("Toggle Wind: " + (windOn ? "On" : "Off"));
 }
 
 function mousePressed() {
@@ -102,5 +132,6 @@ function drawOverlay() {
   text(`Fireflies: ${fireflies.length}`, 10, 20);
   text(`Mode: ${chaoticMode ? "Chaotic" : "Calm"}`, 10, 40);
   text(`Polarity: ${polarity === 1 ? "Attract" : "Repel"}`, 10, 60);
-  text(`Press O/M/P/R/N to test keys`, 10, 80);
+  text(`Wind: ${windOn ? "On" : "Off"}`, 10, 80);
+  text(`Press O/M/P/R/N to test keys`, 10, 100);
 }

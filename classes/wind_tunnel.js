@@ -13,4 +13,11 @@ class WindTunnel {
     let wind = createVector(chaoticMode ? 1.2 : 0.2, 0);
     body.applyForce(wind);
   }
+
+  display() {
+    fill(100, 150, 255, 50); // Light blue transparent color
+    noStroke();
+    let {x, y, w, h} = this.bounds;
+    rect(x, y, w, h);
+  }
 }
