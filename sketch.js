@@ -7,7 +7,9 @@ let polarity = 1;
 let seed = 12345;
 let canvas;
 let spawnInterval;
+let windInterval;
 let windOn = true;
+let windDirection = 1;
 let toggleButton;
 
 function setup() {
@@ -38,16 +40,26 @@ function setup() {
 
   attractors.push(new Attractor(width / 2, height / 2, edgeStrength));
 
-  // Wind tunnel setup
   windTunnel = new WindTunnel(200, 150, 400, 300);
 
-  // Create toggle button for wind
   toggleButton = createButton("Toggle Wind: On");
   toggleButton.position(10, height + 10);
   toggleButton.mousePressed(toggleWind);
 
-  // Auto-spawn fireflies from cursor every 0.5 seconds
-  spawnInterval = setInterval(spawnFromCursor, 200);
+  spawnInterval = setInterval(spawnFromCursor, 500);
+
+  setWindInterval();
+}
+
+function setWindInterval() {
+  clearInterval(windInterval);
+  let intervalTime = chaoticMode ? 750 : 1500;
+  windInterval = setInterval(changeWindDirection, intervalTime);
+}
+
+function changeWindDirection() {
+
+  windDirection = random([-1, 1]);
 }
 
 function draw() {
@@ -57,7 +69,6 @@ function draw() {
     attractor.display();
   }
 
-  // Display the wind tunnel if wind is on
   if (windOn) {
     windTunnel.display();
   }
@@ -83,14 +94,12 @@ function draw() {
   }
 }
 
-// Auto-spawn fireflies from cursor position every 0.5 seconds
 function spawnFromCursor() {
   if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
     fireflies.push(new Firefly(mouseX, mouseY));
   }
 }
 
-// Toggle the wind effect
 function toggleWind() {
   windOn = !windOn;
   toggleButton.html("Toggle Wind: " + (windOn ? "On" : "Off"));
@@ -103,7 +112,10 @@ function mousePressed() {
 function handleKeyPress(e) {
   let k = e.key.toUpperCase();
   if (k === 'O') showOverlay = !showOverlay;
-  if (k === 'M') chaoticMode = !chaoticMode;
+  if (k === 'M') {
+    chaoticMode = !chaoticMode;
+    setWindInterval(); 
+  }
   if (k === 'P') polarity *= -1;
   if (k === 'R') {
     seed = 12345;
@@ -133,5 +145,6 @@ function drawOverlay() {
   text(`Mode: ${chaoticMode ? "Chaotic" : "Calm"}`, 10, 40);
   text(`Polarity: ${polarity === 1 ? "Attract" : "Repel"}`, 10, 60);
   text(`Wind: ${windOn ? "On" : "Off"}`, 10, 80);
-  text(`Press O/M/P/R/N to test keys`, 10, 100);
+  text(`Direction: ${windDirection === 1 ? "Right" : "Left"}`, 10, 100);
+  text(`Press O/M/P/R/N to test keys`, 10, 120);
 }
