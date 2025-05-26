@@ -16,7 +16,6 @@ function setup() {
   canvas = createCanvas(800, 600);
   canvas.elt.setAttribute("tabindex", "0");
   canvas.elt.focus();
-  window.addEventListener("keydown", handleKeyPress);
 
   randomSeed(seed);
   noiseSeed(seed);
@@ -34,7 +33,7 @@ function setup() {
   }
 
   for (let y = 0; y <= height; y += spacing) {
-    attractors.push(new Attractor(0, y, edgeStrength)); 
+    attractors.push(new Attractor(0, y, edgeStrength));
     attractors.push(new Attractor(width, y, edgeStrength));
   }
 
@@ -42,12 +41,46 @@ function setup() {
 
   windTunnel = new WindTunnel(200, 150, 400, 300);
 
+  // === Button Controls ===
   toggleButton = createButton("Toggle Wind: On");
   toggleButton.position(10, height + 10);
   toggleButton.mousePressed(toggleWind);
 
-  spawnInterval = setInterval(spawnFromCursor, 500);
+  let overlayButton = createButton("Toggle Overlay");
+  overlayButton.position(10, height + 40);
+  overlayButton.mousePressed(() => {
+    showOverlay = !showOverlay;
+  });
 
+  let modeButton = createButton("Toggle Mode");
+  modeButton.position(130, height + 40);
+  modeButton.mousePressed(() => {
+    chaoticMode = !chaoticMode;
+    setWindInterval();
+  });
+
+  let polarityButton = createButton("Toggle Polarity");
+  polarityButton.position(250, height + 40);
+  polarityButton.mousePressed(() => {
+    polarity *= -1;
+  });
+
+  let resetButton = createButton("Reset (Same Seed)");
+  resetButton.position(370, height + 40);
+  resetButton.mousePressed(() => {
+    seed = 12345;
+    resetSketch();
+  });
+
+  let newSeedButton = createButton("Reset (New Seed)");
+  newSeedButton.position(510, height + 40);
+  newSeedButton.mousePressed(() => {
+    seed = floor(random(99999));
+    resetSketch();
+  });
+
+  // === Intervals ===
+  spawnInterval = setInterval(spawnFromCursor, 500);
   setWindInterval();
 }
 
@@ -58,7 +91,6 @@ function setWindInterval() {
 }
 
 function changeWindDirection() {
-
   windDirection = random([-1, 1]);
 }
 
@@ -109,24 +141,6 @@ function mousePressed() {
   fireflies.push(new Firefly(mouseX, mouseY));
 }
 
-function handleKeyPress(e) {
-  let k = e.key.toUpperCase();
-  if (k === 'O') showOverlay = !showOverlay;
-  if (k === 'M') {
-    chaoticMode = !chaoticMode;
-    setWindInterval(); 
-  }
-  if (k === 'P') polarity *= -1;
-  if (k === 'R') {
-    seed = 12345;
-    resetSketch();
-  }
-  if (k === 'N') {
-    seed = floor(random(99999));
-    resetSketch();
-  }
-}
-
 function resetSketch() {
   fireflies = [];
   attractors = [];
@@ -146,5 +160,5 @@ function drawOverlay() {
   text(`Polarity: ${polarity === 1 ? "Attract" : "Repel"}`, 10, 60);
   text(`Wind: ${windOn ? "On" : "Off"}`, 10, 80);
   text(`Direction: ${windDirection === 1 ? "Right" : "Left"}`, 10, 100);
-  text(`Press O/M/P/R/N to test keys`, 10, 120);
+  text(`Use buttons below to control overlay, mode, polarity, and reset`, 10, 120);
 }
