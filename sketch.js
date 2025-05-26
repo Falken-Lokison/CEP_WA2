@@ -80,7 +80,7 @@ function setup() {
   });
 
   // === Intervals ===
-  spawnInterval = setInterval(spawnFromCursor, 1000);
+  spawnInterval = setInterval(spawnFromCursor, 500);
   setWindInterval();
 }
 
@@ -98,6 +98,21 @@ function draw() {
   background(20, 20, 30, 80);
 
   for (let attractor of attractors) {
+    let isEdge = (
+      attractor.position.x === 0 ||
+      attractor.position.x === width ||
+      attractor.position.y === 0 ||
+      attractor.position.y === height
+    );
+
+    if (polarity === -1 && isEdge) {
+      push();
+      noStroke();
+      fill(255, 255, 200, 80);
+      ellipse(attractor.position.x, attractor.position.y, 30);
+      pop();
+    }
+
     attractor.display();
   }
 
@@ -108,6 +123,18 @@ function draw() {
   for (let f of fireflies) {
     for (let a of attractors) {
       let force = a.attract(f);
+
+      let isEdge = (
+        a.position.x === 0 ||
+        a.position.x === width ||
+        a.position.y === 0 ||
+        a.position.y === height
+      );
+
+      if (polarity === -1 && isEdge) {
+        force.mult(2);
+      }
+
       f.applyForce(force);
     }
 
