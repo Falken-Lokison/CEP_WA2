@@ -80,7 +80,7 @@ function setup() {
   });
 
   // === Intervals ===
-  spawnInterval = setInterval(spawnFromCursor, 500);
+  spawnInterval = setInterval(spawnFromCursor, 1000);
   setWindInterval();
 }
 
