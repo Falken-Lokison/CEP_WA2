@@ -11,6 +11,7 @@ let windInterval;
 let windOn = true;
 let windDirection = 1;
 let toggleButton;
+let strengthSlider;
 
 function setup() {
   canvas = createCanvas(800, 600);
@@ -24,7 +25,7 @@ function setup() {
     fireflies.push(new Firefly(random(width), random(height)));
   }
 
-  let edgeStrength = 100;
+  let edgeStrength = 100; // initial value (will be overridden by slider)
   let spacing = 50;
 
   for (let x = 0; x <= width; x += spacing) {
@@ -79,7 +80,11 @@ function setup() {
     resetSketch();
   });
 
-  // === Intervals ===
+  // === Slider ===
+  strengthSlider = createSlider(50, 200, 100);
+  strengthSlider.position(650, height + 40);
+  strengthSlider.style('width', '120px');
+
   spawnInterval = setInterval(spawnFromCursor, 500);
   setWindInterval();
 }
@@ -107,6 +112,7 @@ function draw() {
 
   for (let f of fireflies) {
     for (let a of attractors) {
+      a.strength = strengthSlider.value(); // dynamically apply slider
       let force = a.attract(f);
       f.applyForce(force);
     }
@@ -144,6 +150,10 @@ function mousePressed() {
 function resetSketch() {
   fireflies = [];
   attractors = [];
+  clear();
+  removeElements(); // clear old buttons/slider
+  clearInterval(spawnInterval);
+  clearInterval(windInterval);
   setup();
 }
 
@@ -160,5 +170,5 @@ function drawOverlay() {
   text(`Polarity: ${polarity === 1 ? "Attract" : "Repel"}`, 10, 60);
   text(`Wind: ${windOn ? "On" : "Off"}`, 10, 80);
   text(`Direction: ${windDirection === 1 ? "Right" : "Left"}`, 10, 100);
-  text(`Use buttons below to control overlay, mode, polarity, and reset`, 10, 120);
+  text(`Attractor Strength: ${strengthSlider.value()}`, 10, 140);
 }
