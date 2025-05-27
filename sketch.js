@@ -81,7 +81,7 @@ function setup() {
   });
 
   // === Slider ===
-  strengthSlider = createSlider(50, 200, 100);
+  strengthSlider = createSlider(0, 200, 100);
   strengthSlider.position(650, height + 40);
   strengthSlider.style('width', '120px');
 
