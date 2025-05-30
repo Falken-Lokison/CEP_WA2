@@ -1,3 +1,4 @@
+// === Global Variables ===
 let fireflies = [];
 let attractors = [];
 let windTunnel;
@@ -10,39 +11,46 @@ let spawnInterval;
 let windInterval;
 let windOn = true;
 let windDirection = 1;
+
+// UI Controls
 let toggleButton;
 let strengthSlider;
 
 function setup() {
+  // === Canvas Setup ===
   canvas = createCanvas(800, 600);
   canvas.elt.setAttribute("tabindex", "0");
   canvas.elt.focus();
 
+  // === Random Seed Setup ===
   randomSeed(seed);
   noiseSeed(seed);
 
+  // === Initial Fireflies ===
   for (let i = 0; i < 8; i++) {
     fireflies.push(new Firefly(random(width), random(height)));
   }
 
-  let edgeStrength = 100; // initial value (will be overridden by slider)
+  // === Attractor Grid Setup ===
+  let edgeStrength = 100;
   let spacing = 50;
 
   for (let x = 0; x <= width; x += spacing) {
-    attractors.push(new Attractor(x, 0, edgeStrength));
-    attractors.push(new Attractor(x, height, edgeStrength));
+    attractors.push(new Attractor(x, 0, edgeStrength));        // Top edge
+    attractors.push(new Attractor(x, height, edgeStrength));   // Bottom edge
   }
 
   for (let y = 0; y <= height; y += spacing) {
-    attractors.push(new Attractor(0, y, edgeStrength));
-    attractors.push(new Attractor(width, y, edgeStrength));
+    attractors.push(new Attractor(0, y, edgeStrength));        // Left edge
+    attractors.push(new Attractor(width, y, edgeStrength));    // Right edge
   }
 
-  attractors.push(new Attractor(width / 2, height / 2, edgeStrength));
+  attractors.push(new Attractor(width / 2, height / 2, edgeStrength)); // Center
 
+  // === Wind Tunnel Setup ===
   windTunnel = new WindTunnel(200, 150, 400, 300);
 
-  // === Button Controls ===
+  // === UI Buttons ===
   toggleButton = createButton("Toggle Wind: On");
   toggleButton.position(10, height + 10);
   toggleButton.mousePressed(toggleWind);
@@ -80,11 +88,12 @@ function setup() {
     resetSketch();
   });
 
-  // === Slider ===
-  strengthSlider = createSlider(0, 200, 100);
-  strengthSlider.position(650, height + 40);
-  strengthSlider.style('width', '120px');
+  // === Attractor Strength Slider ===
+  strengthSlider = createSlider(50, 200, 100);
+  strengthSlider.position(25, 140);
+  strengthSlider.style('width', '140px');
 
+  // === Timed Functions ===
   spawnInterval = setInterval(spawnFromCursor, 500);
   setWindInterval();
 }
@@ -100,23 +109,27 @@ function changeWindDirection() {
 }
 
 function draw() {
-  background(20, 20, 30, 80);
+  background(20, 20, 30, 80); // dark semi-transparent background
 
+  // === Display All Attractors ===
   for (let attractor of attractors) {
     attractor.display();
   }
 
+  // === Display Wind Tunnel if On ===
   if (windOn) {
     windTunnel.display();
   }
 
+  // === Update and Display Each Firefly ===
   for (let f of fireflies) {
     for (let a of attractors) {
-      a.strength = strengthSlider.value(); // dynamically apply slider
+      a.strength = strengthSlider.value(); // Apply slider strength
       let force = a.attract(f);
       f.applyForce(force);
     }
 
+    // Apply wind if inside tunnel
     if (windOn && windTunnel.contains(f)) {
       windTunnel.applyEffect(f);
     }
@@ -127,8 +140,13 @@ function draw() {
 
   cleanUp();
 
+  // === Draw Overlay if Enabled ===
   if (showOverlay) {
     drawOverlay();
+    strengthSlider.show();
+  }
+  else{
+    strengthSlider.hide();
   }
 }
 
@@ -151,7 +169,7 @@ function resetSketch() {
   fireflies = [];
   attractors = [];
   clear();
-  removeElements(); // clear old buttons/slider
+  removeElements(); // clear buttons and sliders
   clearInterval(spawnInterval);
   clearInterval(windInterval);
   setup();
@@ -161,14 +179,26 @@ function cleanUp() {
   fireflies = fireflies.filter(f => !f.isDead());
 }
 
+// === HUD + Info Text Overlay ===
 function drawOverlay() {
   fill(255);
   noStroke();
   textSize(14);
-  text(`Fireflies: ${fireflies.length}`, 10, 20);
-  text(`Mode: ${chaoticMode ? "Chaotic" : "Calm"}`, 10, 40);
-  text(`Polarity: ${polarity === 1 ? "Attract" : "Repel"}`, 10, 60);
-  text(`Wind: ${windOn ? "On" : "Off"}`, 10, 80);
-  text(`Direction: ${windDirection === 1 ? "Right" : "Left"}`, 10, 100);
-  text(`Attractor Strength: ${strengthSlider.value()}`, 10, 140);
+  textAlign(LEFT);
+
+  // Left-side Status Panel
+  text(`Fireflies: ${fireflies.length}`, 20, 30);
+  text(`Mode: ${chaoticMode ? "Chaotic" : "Calm"}`, 20, 50);
+  text(`Polarity: ${polarity === 1 ? "Attract" : "Repel"}`, 20, 70);
+  text(`Wind: ${windOn ? "On" : "Off"}`, 20, 90);
+  text(`Direction: ${windDirection === 1 ? "Right" : "Left"}`, 20, 110);
+  text(`Attractor Strength: ${strengthSlider.value()}`, 20, 130);
+
+  // Right-side Educational Quote
+  let quoteX = width - 230;
+  let quoteY = 30;
+  let quote = "Fireflies being attracted to fire,\nwhich somehow is really similar to\ncharged particles in a field,\nusing the formula:\nF = G * (m1 * m2) / r²";
+
+  textAlign(LEFT);
+  text(quote, quoteX, quoteY);
 }

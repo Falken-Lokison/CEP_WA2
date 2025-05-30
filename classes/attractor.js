@@ -14,16 +14,16 @@ class Attractor {
   }
 
   display() {
-    fill(150,150,150);
+    fill(100,100,255);
     noStroke();
     ellipse(this.pos.x, this.pos.y, 34);
-    fill(200,200,200);
+    fill(150,150,255);
     noStroke();
     ellipse(this.pos.x, this.pos.y, 26);
-    fill(255,255,255);
+    fill(180,180,255);
     noStroke();
     ellipse(this.pos.x, this.pos.y, 20);
-    fill(255, 0, 180);
+    fill(0, 0, 255);
     noStroke();
     ellipse(this.pos.x, this.pos.y, 16);
   }
